@@ -29,7 +29,7 @@ async def generate_creative_variations(prompt, tone, format_type, num_variations
     azure_model = get_azure_model()
     agent = Agent(
         model=azure_model,
-        result_type=List[CreativeVariation],
+        output_type=List[CreativeVariation],
         system_prompt=(
             "You are a creative marketing copywriter. "
             "Given a campaign brief, tone, and format, generate a list of creative ad copy variations. "
@@ -52,7 +52,7 @@ async def generate_ab_testing_suggestions(prompt, variations):
     azure_model = get_azure_model()
     agent = Agent(
         model=azure_model,
-        result_type=List[ABTestSuggestion],
+        output_type=List[ABTestSuggestion],
         system_prompt=(
             "You are a digital marketing strategist. "
             "Given a campaign brief and a list of creative variations, "
@@ -73,7 +73,7 @@ async def generate_hashtags_and_social_posts(prompt, variations):
     azure_model = get_azure_model()
     agent = Agent(
         model=azure_model,
-        result_type=List[SocialPost],
+        output_type=List[SocialPost],
         system_prompt=(
             "You are a social media marketer. "
             "Given a campaign brief and a list of creative variations, "
@@ -236,7 +236,7 @@ def show_creative_asset_generator():
 #     azure_model = get_azure_model()
 #     agent = Agent(
 #         model=azure_model,
-#         result_type=List[CreativeVariation],
+#         output_type=List[CreativeVariation],
 #         system_prompt=(
 #             "You are a creative marketing copywriter. "
 #             "Given a campaign brief, tone, and format, generate a list of creative ad copy variations. "
@@ -259,7 +259,7 @@ def show_creative_asset_generator():
 #     azure_model = get_azure_model()
 #     agent = Agent(
 #         model=azure_model,
-#         result_type=List[ABTestSuggestion],
+#         output_type=List[ABTestSuggestion],
 #         system_prompt=(
 #             "You are a digital marketing strategist. "
 #             "Given a campaign brief and a list of creative variations, "
@@ -280,7 +280,7 @@ def show_creative_asset_generator():
 #     azure_model = get_azure_model()
 #     agent = Agent(
 #         model=azure_model,
-#         result_type=List[SocialPost],
+#         output_type=List[SocialPost],
 #         system_prompt=(
 #             "You are a social media marketer. "
 #             "Given a campaign brief and a list of creative variations, "

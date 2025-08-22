@@ -124,7 +124,9 @@ async def run_pipeline_from_ui(
         if missing_config:
             raise Exception(f"Missing database configuration: {missing_config}")
         
-        db_manager = DatabaseManager(db_config)
+        # db_manager = DatabaseManager(db_config)
+        excel_path = os.getenv("EXCEL_PATH", "campaigns.xlsx")
+        db_manager = DatabaseManager(excel_path)
 
         # Extract campaign details
         campaign_objective = campaign_details.get("campaign_objective")
@@ -140,11 +142,11 @@ async def run_pipeline_from_ui(
 
         # Initialize database
         update_status("🗄️ Initializing database connection...")
-        await db_manager.initialize_database()
+        # await db_manager.initialize_database()
         
         # Only populate sample data if needed (check if data exists first)
         update_status("📊 Checking and populating sample data...")
-        await db_manager.populate_sample_data()
+        # await db_manager.populate_sample_data()
 
         update_status("🎉 Starting enhanced campaign generation...")
         pipeline = EnhancedMarketingCampaignPipeline(azure_model, db_manager)
@@ -199,7 +201,7 @@ async def detect_sections_to_update_async(feedback, campaign_brief):
         )
         agent = Agent(
             model=azure_model,
-            result_type=str,
+            output_type=str,
             system_prompt=system_prompt
         )
         result = await agent.run(user_prompt)

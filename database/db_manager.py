@@ -1,10 +1,249 @@
 # database/db_manager.py
 # import asyncio
-import asyncpg
-import random
+# import asyncpg
+# import random
+# from typing import Dict, Any, List
+# from dataclasses import dataclass
+# from datetime import datetime, timedelta
+
+# @dataclass
+# class CampaignRecord:
+#     campaign_id: str
+#     campaign_name: str
+#     industry: str
+#     target_audience: str
+#     channels: List[str]
+#     budget: float
+#     duration_days: int
+#     ctr: float  # Click-through rate
+#     conversion_rate: float
+#     roas: float  # Return on ad spend
+#     engagement_rate: float
+#     brand_lift: float
+#     success_score: float
+#     creative_type: str
+#     messaging_tone: str
+#     launch_date: datetime
+#     created_at: datetime
+
+# class DatabaseManager:
+#     def __init__(self, db_config: Dict[str, Any]):
+#         self.db_config = db_config
+#         self.connection_pool = None
+
+#     async def initialize_database(self):
+#         """Initialize database connection pool and create tables"""
+#         try:
+#             # Create connection pool
+#             self.connection_pool = await asyncpg.create_pool(
+#                 **self.db_config,
+#                 min_size=1,
+#                 max_size=10
+#             )
+#             # Create tables
+#             await self.create_tables()
+#             print("✅ Database initialized successfully!")
+#         except Exception as e:
+#             print(f"❌ Database initialization failed: {e}")
+#             raise
+
+#     async def create_tables(self):
+#         """Create campaign tables"""
+#         create_table_sql = """
+#         CREATE TABLE IF NOT EXISTS campaigns (
+#             campaign_id VARCHAR(50) PRIMARY KEY,
+#             campaign_name VARCHAR(200) NOT NULL,
+#             industry VARCHAR(100) NOT NULL,
+#             target_audience TEXT NOT NULL,
+#             channels TEXT[] NOT NULL,
+#             budget DECIMAL(12,2) NOT NULL,
+#             duration_days INTEGER NOT NULL,
+#             ctr DECIMAL(5,4) NOT NULL,
+#             conversion_rate DECIMAL(5,4) NOT NULL,
+#             roas DECIMAL(8,2) NOT NULL,
+#             engagement_rate DECIMAL(5,4) NOT NULL,
+#             brand_lift DECIMAL(5,4) NOT NULL,
+#             success_score DECIMAL(5,2) NOT NULL,
+#             creative_type VARCHAR(100) NOT NULL,
+#             messaging_tone VARCHAR(100) NOT NULL,
+#             launch_date TIMESTAMP NOT NULL,
+#             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+#         );
+
+#         CREATE INDEX IF NOT EXISTS idx_campaigns_industry ON campaigns(industry);
+#         CREATE INDEX IF NOT EXISTS idx_campaigns_success_score ON campaigns(success_score);
+#         CREATE INDEX IF NOT EXISTS idx_campaigns_channels ON campaigns USING GIN(channels);
+#         CREATE INDEX IF NOT EXISTS idx_campaigns_launch_date ON campaigns(launch_date);
+#         """
+#         async with self.connection_pool.acquire() as conn:
+#             await conn.execute(create_table_sql)
+
+#     def generate_sample_campaigns(self) -> List[CampaignRecord]:
+#         """Generate diverse sample campaign data"""
+#         industries = ["Technology", "Healthcare", "Finance", "Retail", "Food & Beverage",
+#                       "Automotive", "Entertainment", "Education", "Fashion", "Travel"]
+
+#         channels = ["Social Media", "Google Ads", "Email Marketing", "Content Marketing",
+#                     "Influencer Marketing", "TV", "Radio", "Print", "Outdoor", "Programmatic"]
+
+#         creative_types = ["Video", "Static Image", "Carousel", "Interactive", "Story",
+#                           "Podcast", "Blog Post", "Infographic", "Animation", "User Generated"]
+
+#         tones = ["Humorous", "Emotional", "Informative", "Urgent", "Inspirational",
+#                  "Professional", "Casual", "Bold", "Caring", "Innovative"]
+
+#         audiences = [
+#             "Young professionals (25-35)", "Parents with children", "Senior citizens (55+)",
+#             "College students", "Small business owners", "Health-conscious consumers",
+#             "Tech enthusiasts", "Budget-conscious families", "Luxury consumers", "Millennials"
+#         ]
+
+#         campaigns = []
+#         base_date = datetime.now() - timedelta(days=365)
+
+#         for i in range(100):  # Generate 100 sample campaigns
+#             # Create realistic performance correlations
+#             budget = random.uniform(5000, 500000)
+#             duration = random.randint(7, 90)
+
+#             # Higher budgets and longer durations tend to perform better
+#             base_performance = min(0.8, (budget / 100000) * 0.3 + (duration / 90) * 0.2 + random.uniform(0.2, 0.6))
+
+#             ctr = max(0.005, base_performance * random.uniform(0.8, 1.2) * 0.05)
+#             conversion_rate = max(0.01, base_performance * random.uniform(0.7, 1.3) * 0.08)
+#             roas = max(1.2, base_performance * random.uniform(0.8, 1.5) * 8)
+#             engagement_rate = max(0.02, base_performance * random.uniform(0.9, 1.1) * 0.15)
+#             brand_lift = max(0.05, base_performance * random.uniform(0.7, 1.2) * 0.25)
+
+#             # Calculate success score
+#             success_score = (ctr * 20 + conversion_rate * 12.5 + (roas - 1) * 2 +
+#                             engagement_rate * 6.67 + brand_lift * 4) / 5
+
+#             campaign = CampaignRecord(
+#                 campaign_id=f"CAMP_{i+1:03d}",
+#                 campaign_name=f"Campaign {i+1}: {random.choice(['Launch', 'Boost', 'Drive', 'Maximize', 'Transform'])} {random.choice(['Sales', 'Awareness', 'Engagement', 'Growth', 'Impact'])}",
+#                 industry=random.choice(industries),
+#                 target_audience=random.choice(audiences),
+#                 channels=random.sample(channels, random.randint(2, 5)),
+#                 budget=round(budget, 2),
+#                 duration_days=duration,
+#                 ctr=round(ctr, 4),
+#                 conversion_rate=round(conversion_rate, 4),
+#                 roas=round(roas, 2),
+#                 engagement_rate=round(engagement_rate, 4),
+#                 brand_lift=round(brand_lift, 4),
+#                 success_score=round(success_score, 2),
+#                 creative_type=random.choice(creative_types),
+#                 messaging_tone=random.choice(tones),
+#                 launch_date=base_date + timedelta(days=random.randint(0, 365)),
+#                 created_at=datetime.now()
+#             )
+#             campaigns.append(campaign)
+#         return campaigns
+
+#     async def populate_sample_data(self):
+#         """Populate database with sample campaign data"""
+#         sample_campaigns = self.generate_sample_campaigns()
+#         insert_sql = """
+#         INSERT INTO campaigns (
+#             campaign_id, campaign_name, industry, target_audience, channels, budget,
+#             duration_days, ctr, conversion_rate, roas, engagement_rate, brand_lift,
+#             success_score, creative_type, messaging_tone, launch_date
+#         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+#         ON CONFLICT (campaign_id) DO NOTHING
+#         """
+#         async with self.connection_pool.acquire() as conn:
+#             for campaign in sample_campaigns:
+#                 await conn.execute(
+#                     insert_sql,
+#                     campaign.campaign_id, campaign.campaign_name, campaign.industry,
+#                     campaign.target_audience, campaign.channels, campaign.budget,
+#                     campaign.duration_days, campaign.ctr, campaign.conversion_rate,
+#                     campaign.roas, campaign.engagement_rate, campaign.brand_lift,
+#                     campaign.success_score, campaign.creative_type, campaign.messaging_tone,
+#                     campaign.launch_date
+#                 )
+#             print(f"✅ Populated {len(sample_campaigns)} sample campaigns!")
+
+#     async def get_successful_campaigns(self, limit: int = 20) -> List[Dict]:
+#         """Get top performing campaigns"""
+#         query = """
+#         SELECT * FROM campaigns
+#         WHERE success_score >= 7.0
+#         ORDER BY success_score DESC, roas DESC
+#         LIMIT $1
+#         """
+#         async with self.connection_pool.acquire() as conn:
+#             rows = await conn.fetch(query, limit)
+#             return [dict(row) for row in rows]
+
+#     async def get_channel_performance(self) -> Dict[str, Dict]:
+#         """Analyze performance by channel"""
+#         query = """
+#         SELECT
+#             channel,
+#             AVG(success_score) as avg_success_score,
+#             AVG(roas) as avg_roas,
+#             AVG(ctr) as avg_ctr,
+#             AVG(conversion_rate) as avg_conversion_rate,
+#             COUNT(*) as campaign_count
+#         FROM (
+#             SELECT unnest(channels) as channel, success_score, roas, ctr, conversion_rate
+#             FROM campaigns
+#         ) channel_data
+#         GROUP BY channel
+#         ORDER BY avg_success_score DESC
+#         """
+#         async with self.connection_pool.acquire() as conn:
+#             rows = await conn.fetch(query)
+#             return {row['channel']: dict(row) for row in rows}
+
+#     async def get_industry_insights(self, industry: str = None) -> List[Dict]:
+#         """Get industry-specific insights"""
+#         if industry:
+#             query = """
+#             SELECT
+#                 industry,
+#                 AVG(success_score) as avg_success_score,
+#                 AVG(budget) as avg_budget,
+#                 AVG(duration_days) as avg_duration,
+#                 array_agg(DISTINCT creative_type) as popular_creative_types,
+#                 array_agg(DISTINCT messaging_tone) as popular_tones
+#             FROM campaigns
+#             WHERE industry ILIKE $1
+#             GROUP BY industry
+#             """
+#             params = [f"%{industry}%"]
+#         else:
+#             query = """
+#             SELECT
+#                 industry,
+#                 AVG(success_score) as avg_success_score,
+#                 AVG(budget) as avg_budget,
+#                 AVG(duration_days) as avg_duration,
+#                 COUNT(*) as campaign_count
+#             FROM campaigns
+#             GROUP BY industry
+#             ORDER BY avg_success_score DESC
+#             """
+#             params = []
+#         async with self.connection_pool.acquire() as conn:
+#             if params:
+#                 rows = await conn.fetch(query, *params)
+#             else:
+#                 rows = await conn.fetch(query)
+#             return [dict(row) for row in rows]
+
+#     async def close(self):
+#         """Close database connection pool"""
+#         if self.connection_pool:
+#             await self.connection_pool.close()
+
+
+import pandas as pd
 from typing import Dict, Any, List
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 @dataclass
 class CampaignRecord:
@@ -12,12 +251,12 @@ class CampaignRecord:
     campaign_name: str
     industry: str
     target_audience: str
-    channels: List[str]
+    channels: list
     budget: float
     duration_days: int
-    ctr: float  # Click-through rate
+    ctr: float
     conversion_rate: float
-    roas: float  # Return on ad spend
+    roas: float
     engagement_rate: float
     brand_lift: float
     success_score: float
@@ -27,214 +266,92 @@ class CampaignRecord:
     created_at: datetime
 
 class DatabaseManager:
-    def __init__(self, db_config: Dict[str, Any]):
-        self.db_config = db_config
-        self.connection_pool = None
+    def __init__(self, excel_path: str):
+        self.excel_path = excel_path
 
-    async def initialize_database(self):
-        """Initialize database connection pool and create tables"""
-        try:
-            # Create connection pool
-            self.connection_pool = await asyncpg.create_pool(
-                **self.db_config,
-                min_size=1,
-                max_size=10
-            )
-            # Create tables
-            await self.create_tables()
-            print("✅ Database initialized successfully!")
-        except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
-            raise
+    async def _load_df(self):
+        return pd.read_excel(self.excel_path)
 
-    async def create_tables(self):
-        """Create campaign tables"""
-        create_table_sql = """
-        CREATE TABLE IF NOT EXISTS campaigns (
-            campaign_id VARCHAR(50) PRIMARY KEY,
-            campaign_name VARCHAR(200) NOT NULL,
-            industry VARCHAR(100) NOT NULL,
-            target_audience TEXT NOT NULL,
-            channels TEXT[] NOT NULL,
-            budget DECIMAL(12,2) NOT NULL,
-            duration_days INTEGER NOT NULL,
-            ctr DECIMAL(5,4) NOT NULL,
-            conversion_rate DECIMAL(5,4) NOT NULL,
-            roas DECIMAL(8,2) NOT NULL,
-            engagement_rate DECIMAL(5,4) NOT NULL,
-            brand_lift DECIMAL(5,4) NOT NULL,
-            success_score DECIMAL(5,2) NOT NULL,
-            creative_type VARCHAR(100) NOT NULL,
-            messaging_tone VARCHAR(100) NOT NULL,
-            launch_date TIMESTAMP NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_campaigns_industry ON campaigns(industry);
-        CREATE INDEX IF NOT EXISTS idx_campaigns_success_score ON campaigns(success_score);
-        CREATE INDEX IF NOT EXISTS idx_campaigns_channels ON campaigns USING GIN(channels);
-        CREATE INDEX IF NOT EXISTS idx_campaigns_launch_date ON campaigns(launch_date);
-        """
-        async with self.connection_pool.acquire() as conn:
-            await conn.execute(create_table_sql)
-
-    def generate_sample_campaigns(self) -> List[CampaignRecord]:
-        """Generate diverse sample campaign data"""
-        industries = ["Technology", "Healthcare", "Finance", "Retail", "Food & Beverage",
-                      "Automotive", "Entertainment", "Education", "Fashion", "Travel"]
-
-        channels = ["Social Media", "Google Ads", "Email Marketing", "Content Marketing",
-                    "Influencer Marketing", "TV", "Radio", "Print", "Outdoor", "Programmatic"]
-
-        creative_types = ["Video", "Static Image", "Carousel", "Interactive", "Story",
-                          "Podcast", "Blog Post", "Infographic", "Animation", "User Generated"]
-
-        tones = ["Humorous", "Emotional", "Informative", "Urgent", "Inspirational",
-                 "Professional", "Casual", "Bold", "Caring", "Innovative"]
-
-        audiences = [
-            "Young professionals (25-35)", "Parents with children", "Senior citizens (55+)",
-            "College students", "Small business owners", "Health-conscious consumers",
-            "Tech enthusiasts", "Budget-conscious families", "Luxury consumers", "Millennials"
-        ]
-
-        campaigns = []
-        base_date = datetime.now() - timedelta(days=365)
-
-        for i in range(100):  # Generate 100 sample campaigns
-            # Create realistic performance correlations
-            budget = random.uniform(5000, 500000)
-            duration = random.randint(7, 90)
-
-            # Higher budgets and longer durations tend to perform better
-            base_performance = min(0.8, (budget / 100000) * 0.3 + (duration / 90) * 0.2 + random.uniform(0.2, 0.6))
-
-            ctr = max(0.005, base_performance * random.uniform(0.8, 1.2) * 0.05)
-            conversion_rate = max(0.01, base_performance * random.uniform(0.7, 1.3) * 0.08)
-            roas = max(1.2, base_performance * random.uniform(0.8, 1.5) * 8)
-            engagement_rate = max(0.02, base_performance * random.uniform(0.9, 1.1) * 0.15)
-            brand_lift = max(0.05, base_performance * random.uniform(0.7, 1.2) * 0.25)
-
-            # Calculate success score
-            success_score = (ctr * 20 + conversion_rate * 12.5 + (roas - 1) * 2 +
-                            engagement_rate * 6.67 + brand_lift * 4) / 5
-
-            campaign = CampaignRecord(
-                campaign_id=f"CAMP_{i+1:03d}",
-                campaign_name=f"Campaign {i+1}: {random.choice(['Launch', 'Boost', 'Drive', 'Maximize', 'Transform'])} {random.choice(['Sales', 'Awareness', 'Engagement', 'Growth', 'Impact'])}",
-                industry=random.choice(industries),
-                target_audience=random.choice(audiences),
-                channels=random.sample(channels, random.randint(2, 5)),
-                budget=round(budget, 2),
-                duration_days=duration,
-                ctr=round(ctr, 4),
-                conversion_rate=round(conversion_rate, 4),
-                roas=round(roas, 2),
-                engagement_rate=round(engagement_rate, 4),
-                brand_lift=round(brand_lift, 4),
-                success_score=round(success_score, 2),
-                creative_type=random.choice(creative_types),
-                messaging_tone=random.choice(tones),
-                launch_date=base_date + timedelta(days=random.randint(0, 365)),
-                created_at=datetime.now()
-            )
-            campaigns.append(campaign)
-        return campaigns
-
-    async def populate_sample_data(self):
-        """Populate database with sample campaign data"""
-        sample_campaigns = self.generate_sample_campaigns()
-        insert_sql = """
-        INSERT INTO campaigns (
-            campaign_id, campaign_name, industry, target_audience, channels, budget,
-            duration_days, ctr, conversion_rate, roas, engagement_rate, brand_lift,
-            success_score, creative_type, messaging_tone, launch_date
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-        ON CONFLICT (campaign_id) DO NOTHING
-        """
-        async with self.connection_pool.acquire() as conn:
-            for campaign in sample_campaigns:
-                await conn.execute(
-                    insert_sql,
-                    campaign.campaign_id, campaign.campaign_name, campaign.industry,
-                    campaign.target_audience, campaign.channels, campaign.budget,
-                    campaign.duration_days, campaign.ctr, campaign.conversion_rate,
-                    campaign.roas, campaign.engagement_rate, campaign.brand_lift,
-                    campaign.success_score, campaign.creative_type, campaign.messaging_tone,
-                    campaign.launch_date
-                )
-            print(f"✅ Populated {len(sample_campaigns)} sample campaigns!")
-
-    async def get_successful_campaigns(self, limit: int = 20) -> List[Dict]:
-        """Get top performing campaigns"""
-        query = """
-        SELECT * FROM campaigns
-        WHERE success_score >= 7.0
-        ORDER BY success_score DESC, roas DESC
-        LIMIT $1
-        """
-        async with self.connection_pool.acquire() as conn:
-            rows = await conn.fetch(query, limit)
-            return [dict(row) for row in rows]
-
-    async def get_channel_performance(self) -> Dict[str, Dict]:
-        """Analyze performance by channel"""
-        query = """
-        SELECT
-            channel,
-            AVG(success_score) as avg_success_score,
-            AVG(roas) as avg_roas,
-            AVG(ctr) as avg_ctr,
-            AVG(conversion_rate) as avg_conversion_rate,
-            COUNT(*) as campaign_count
-        FROM (
-            SELECT unnest(channels) as channel, success_score, roas, ctr, conversion_rate
-            FROM campaigns
-        ) channel_data
-        GROUP BY channel
-        ORDER BY avg_success_score DESC
-        """
-        async with self.connection_pool.acquire() as conn:
-            rows = await conn.fetch(query)
-            return {row['channel']: dict(row) for row in rows}
-
-    async def get_industry_insights(self, industry: str = None) -> List[Dict]:
-        """Get industry-specific insights"""
-        if industry:
-            query = """
-            SELECT
-                industry,
-                AVG(success_score) as avg_success_score,
-                AVG(budget) as avg_budget,
-                AVG(duration_days) as avg_duration,
-                array_agg(DISTINCT creative_type) as popular_creative_types,
-                array_agg(DISTINCT messaging_tone) as popular_tones
-            FROM campaigns
-            WHERE industry ILIKE $1
-            GROUP BY industry
-            """
-            params = [f"%{industry}%"]
-        else:
-            query = """
-            SELECT
-                industry,
-                AVG(success_score) as avg_success_score,
-                AVG(budget) as avg_budget,
-                AVG(duration_days) as avg_duration,
-                COUNT(*) as campaign_count
-            FROM campaigns
-            GROUP BY industry
-            ORDER BY avg_success_score DESC
-            """
-            params = []
-        async with self.connection_pool.acquire() as conn:
-            if params:
-                rows = await conn.fetch(query, *params)
-            else:
-                rows = await conn.fetch(query)
-            return [dict(row) for row in rows]
+    async def generate_sample_campaigns(self) -> List[CampaignRecord]:
+        # Optionally implement if you want to generate and save sample data to Excel
+        return []
 
     async def close(self):
-        """Close database connection pool"""
-        if self.connection_pool:
-            await self.connection_pool.close()
+        # No-op for Excel
+        pass
+
+    async def get_successful_campaigns(self, limit: int = 20) -> List[Dict]:
+        df = await self._load_df()
+        df = df[df['success_score'] >= 7.0]
+        df = df.sort_values(['success_score', 'roas'], ascending=[False, False])
+        return df.head(limit).to_dict(orient='records')
+
+    # async def get_channel_performance(self) -> Dict[str, Dict]:
+    #     df = await self._load_df()
+    #     channel_stats = {}
+    #     for _, row in df.iterrows():
+    #         for channel in row['channels']:
+    #             if channel not in channel_stats:
+    #                 channel_stats[channel] = {'success_score': [], 'roas': [], 'ctr': [], 'conversion_rate': [], 'count': 0}
+    #             channel_stats[channel]['success_score'].append(row['success_score'])
+    #             channel_stats[channel]['roas'].append(row['roas'])
+    #             channel_stats[channel]['ctr'].append(row['ctr'])
+    #             channel_stats[channel]['conversion_rate'].append(row['conversion_rate'])
+    #             channel_stats[channel]['count'] += 1
+    #     result = {}
+    #     for channel, stats in channel_stats.items():
+    #         result[channel] = {
+    #             'avg_success_score': sum(stats['success_score']) / stats['count'],
+    #             'avg_roas': sum(stats['roas']) / stats['count'],
+    #             'avg_ctr': sum(stats['ctr']) / stats['count'],
+    #             'avg_conversion_rate': sum(stats['conversion_rate']) / stats['count'],
+    #             'campaign_count': stats['count']
+    #         }
+    #     return result
+
+    async def get_channel_performance(self) -> Dict[str, Dict]:
+        df = await self._load_df()
+        channel_stats = {}
+        for _, row in df.iterrows():
+            channels = row['channels']
+            if isinstance(channels, str):
+                channels = [c.strip() for c in channels.split(',') if c.strip()]
+            elif not isinstance(channels, list):
+                channels = []
+            for channel in channels:
+                if channel not in channel_stats:
+                    channel_stats[channel] = {'success_score': [], 'roas': [], 'ctr': [], 'conversion_rate': [], 'count': 0}
+                try:
+                    channel_stats[channel]['success_score'].append(float(row['success_score']))
+                    channel_stats[channel]['roas'].append(float(row['roas']))
+                    channel_stats[channel]['ctr'].append(float(row['ctr']))
+                    channel_stats[channel]['conversion_rate'].append(float(row['conversion_rate']))
+                    channel_stats[channel]['count'] += 1
+                except Exception:
+                    continue
+        result = {}
+        for channel, stats in channel_stats.items():
+            count = stats['count']
+            result[channel] = {
+                'avg_success_score': sum(stats['success_score']) / count if count else 0,
+                'avg_roas': sum(stats['roas']) / count if count else 0,
+                'avg_ctr': sum(stats['ctr']) / count if count else 0,
+                'avg_conversion_rate': sum(stats['conversion_rate']) / count if count else 0,
+                'campaign_count': count
+            }
+        return result
+
+    async def get_industry_insights(self, industry: str = None) -> List[Dict]:
+        df = await self._load_df()
+        if industry:
+            df = df[df['industry'].str.contains(industry, case=False, na=False)]
+        if df.empty:
+            return []
+        grouped = df.groupby('industry').agg({
+            'success_score': 'mean',
+            'budget': 'mean',
+            'duration_days': 'mean',
+            'creative_type': lambda x: list(pd.unique(x)),
+            'messaging_tone': lambda x: list(pd.unique(x))
+        }).reset_index()
+        return grouped.to_dict(orient='records')
