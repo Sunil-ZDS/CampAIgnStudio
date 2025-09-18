@@ -188,7 +188,7 @@ def show_campaign_designer():
         campaign_brief = st.session_state.pipeline_result
         st.success("✅ Campaign brief generated successfully!")
 
-        st.markdown('<h2 class="section-title">📋 Data-Driven Campaign Brief</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 class="section-title">Data-Driven Campaign Brief</h2>', unsafe_allow_html=True)
 
         def display_section(header: str, content: str):
             st.markdown(f'<div class="section-header">{header}</div>', unsafe_allow_html=True)
@@ -202,23 +202,23 @@ def show_campaign_designer():
 
         # Executive Summary
         if hasattr(campaign_brief, 'executive_summary'):
-            display_section("📊 Executive Summary", campaign_brief.executive_summary)
+            display_section("Executive Summary", campaign_brief.executive_summary)
 
         # Strategy Overview
         if hasattr(campaign_brief, 'strategy_overview'):
-            display_section("🎯 Strategy Overview", campaign_brief.strategy_overview)
+            display_section("Strategy Overview", campaign_brief.strategy_overview)
 
         # Creative Direction
         if hasattr(campaign_brief, 'creative_direction'):
-            display_section("🎨 Creative Direction", campaign_brief.creative_direction)
+            display_section("Creative Direction", campaign_brief.creative_direction)
 
         # Implementation Plan
         if hasattr(campaign_brief, 'implementation_plan'):
-            display_section("🚀 Implementation Plan", campaign_brief.implementation_plan)
+            display_section("Implementation Plan", campaign_brief.implementation_plan)
 
         # Success Metrics
         if hasattr(campaign_brief, 'success_metrics'):
-            st.markdown('<div class="section-header">📈 Success Metrics</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Success Metrics</div>', unsafe_allow_html=True)
             metrics = campaign_brief.success_metrics
             if isinstance(metrics, list):
                 for metric in metrics:
@@ -229,13 +229,13 @@ def show_campaign_designer():
 
         # Analyst Insights
         if hasattr(campaign_brief, 'analyst_insights'):
-            st.markdown('<div class="section-header">📊 Analyst Insights</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Analyst Insights</div>', unsafe_allow_html=True)
             for line in campaign_brief.analyst_insights.split("."):
                 st.markdown(f"- {line.strip()}")
 
         # Next Steps
         if hasattr(campaign_brief, 'next_steps'):
-            st.markdown('<div class="section-header">⏭ Next Steps</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Next Steps</div>', unsafe_allow_html=True)
             next_steps = campaign_brief.next_steps
             if isinstance(next_steps, list):
                 for step in next_steps:
@@ -249,10 +249,8 @@ def show_campaign_designer():
 
     if st.session_state.chat_history:
         for entry in st.session_state.chat_history:
-            if entry["role"] == "user":
-                st.markdown(f'<div class="user-msg"><b>You:</b> {entry["content"]}</div>')
-            elif entry["role"] == "assistant":
-                st.markdown(f'<div class="ai-msg"><b>CampAIgn:</b> {entry["content"]}</div>')
+            st.markdown(f'<div class="user-msg">👤 <b>You: </b> {entry["user"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="ai-msg">🧠 <b>CampAIgn: </b> {entry["ai"]}</div>', unsafe_allow_html=True)
 
     if st.session_state.revision_in_progress:
         st.info("🔄 Processing your revision request... Please wait.")

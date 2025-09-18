@@ -55,3 +55,6 @@ class CampaignBrief(BaseModel):
     success_metrics: List[str] = Field(description="The KPIs to track and measure campaign success.") #Should be typed object instead - name, goal, measurement_method, expected_result - List[SuccessMetric]]
     analyst_insights: str = Field(description="Direct insights from the data analysis phase.")
     next_steps: List[str] = Field(description="Actionable next steps for the campaign team.")
+    historic_performance_md: str = ""
+    projected_performance_md: str = ""
+    recommendations: List[str] = []

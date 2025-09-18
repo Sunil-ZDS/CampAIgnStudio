@@ -139,8 +139,8 @@ else:
         st.info("📈 Performance Forecasting Engine – Coming soon...")
     elif current_tool == "creative_asset_generator":
         # st.info("📝 Creative Asset Generator – Coming soon...")
-        from tools.create.CreativeAssetGenerator import show_creative_asset_generator
-        show_creative_asset_generator()
+        from tools.create.CreativeAssetGenerator import show_creative_asset_generator2
+        show_creative_asset_generator2()
     elif current_tool == "influencer_matching_and_briefing_tool":
         st.info("🤝 Influencer Matching & Briefing Tool – Coming soon...")
     elif current_tool == "landing_page_analyzer":

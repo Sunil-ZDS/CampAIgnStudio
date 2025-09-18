@@ -81,5 +81,3 @@ class StrategyAgent:
 
         result = await self.agent.run(prompt)
         return result.output
-    
-

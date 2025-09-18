@@ -1,18 +1,14 @@
-# tools/plan/campaign_designer.py
-
 import streamlit as st
 import asyncio
 import threading
 import queue
 import time
-
 from core.pipeline import run_pipeline_from_ui, detect_sections_to_update
 from agents.orchestrator_agent import OrchestratorAgent
 from services.openai_config import create_azure_openai_model
 
-
 def show_campaign_designer():
-    st.markdown("## 🎯 Campaign Designer – Generate Your Brief")
+    st.markdown("## Campaign Designer")
 
     # Initialize session state defaults
     default_values = {
@@ -183,66 +179,84 @@ def show_campaign_designer():
             time.sleep(1)
             st.rerun()
 
-    # Display results
     if st.session_state.pipeline_result:
         campaign_brief = st.session_state.pipeline_result
         st.success("✅ Campaign brief generated successfully!")
 
-        st.markdown('<h2 class="section-title">📋 Data-Driven Campaign Brief</h2>', unsafe_allow_html=True)
+        # Section box styling
+        box_css = """
+        <style>
+        .section-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 1.2em 1.5em;
+            margin-bottom: 1.5em;
+            border-left: 6px solid #4F8BF9;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+        }
+        </style>
+        """
+        st.markdown(box_css, unsafe_allow_html=True)
 
-        def display_section(header: str, content: str):
-            st.markdown(f'<div class="section-header">{header}</div>', unsafe_allow_html=True)
-            if isinstance(content, str):
-                lines = [line.strip() for line in content.split('.') if line.strip()]
-                for line in lines:
-                    st.markdown(f"- {line}")
-            elif isinstance(content, list):
-                for item in content:
-                    st.markdown(f"- {item}")
-
-        # Executive Summary
-        if hasattr(campaign_brief, 'executive_summary'):
-            display_section("📊 Executive Summary", campaign_brief.executive_summary)
-
-        # Strategy Overview
-        if hasattr(campaign_brief, 'strategy_overview'):
-            display_section("🎯 Strategy Overview", campaign_brief.strategy_overview)
-
-        # Creative Direction
-        if hasattr(campaign_brief, 'creative_direction'):
-            display_section("🎨 Creative Direction", campaign_brief.creative_direction)
-
-        # Implementation Plan
-        if hasattr(campaign_brief, 'implementation_plan'):
-            display_section("🚀 Implementation Plan", campaign_brief.implementation_plan)
-
-        # Success Metrics
-        if hasattr(campaign_brief, 'success_metrics'):
-            st.markdown('<div class="section-header">📈 Success Metrics</div>', unsafe_allow_html=True)
-            metrics = campaign_brief.success_metrics
-            if isinstance(metrics, list):
-                for metric in metrics:
-                    st.markdown(f"- {metric}")
+        def section_box(title, content, markdown=True):
+            st.markdown(f'<div class="section-box"><div class="section-title">{title}</div>', unsafe_allow_html=True)
+            if markdown:
+                st.markdown(content, unsafe_allow_html=True)
             else:
-                for line in metrics.split("."):
-                    st.markdown(f"- {line.strip()}")
+                st.write(content)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        # Analyst Insights
-        if hasattr(campaign_brief, 'analyst_insights'):
-            st.markdown('<div class="section-header">📊 Analyst Insights</div>', unsafe_allow_html=True)
-            for line in campaign_brief.analyst_insights.split("."):
-                st.markdown(f"- {line.strip()}")
+        section_box("Executive Summary", campaign_brief.executive_summary)
+        section_box("Strategy Overview", campaign_brief.strategy_overview)
+        section_box("Historic Performance (Last 12 Months)", campaign_brief.historic_performance_md)
+        section_box("Projected Outcomes (Next 3 Months, Optimized Mix)", campaign_brief.projected_performance_md)
+        section_box("Creative Direction", campaign_brief.creative_direction)
+        section_box("Implementation Plan", campaign_brief.implementation_plan)
+        section_box("Success Metrics", "\n".join([f"- {metric}" for metric in campaign_brief.success_metrics]))
+        section_box("Analyst Insights", campaign_brief.analyst_insights)
+        # section_box("Recommendations", "\n".join([f"- {rec}" for rec in campaign_brief.recommendations]))
+        section_box("Next Steps", "\n".join([f"{i+1}. {step}" for i, step in enumerate(campaign_brief.next_steps)]))
 
-        # Next Steps
-        if hasattr(campaign_brief, 'next_steps'):
-            st.markdown('<div class="section-header">⏭ Next Steps</div>', unsafe_allow_html=True)
-            next_steps = campaign_brief.next_steps
-            if isinstance(next_steps, list):
-                for step in next_steps:
-                    st.markdown(f"- {step}")
-            else:
-                for step in next_steps.split("."):
-                    st.markdown(f"- {step.strip()}")
+
+        # st.markdown("### Executive Summary")
+        # st.markdown(campaign_brief.executive_summary)
+
+        # st.markdown("### Strategy Overview")
+        # st.markdown(campaign_brief.strategy_overview)
+
+        # st.markdown("### Historic Performance (Last 12 Months)")
+        # st.markdown(campaign_brief.historic_performance_md, unsafe_allow_html=True)
+
+        # st.markdown("### Projected Outcomes (Next 3 Months, Optimized Mix)")
+        # st.markdown(campaign_brief.projected_performance_md, unsafe_allow_html=True)
+
+        # st.markdown("### Creative Direction")
+        # st.markdown(campaign_brief.creative_direction)
+
+        # st.markdown("### Implementation Plan")
+        # st.markdown(campaign_brief.implementation_plan, unsafe_allow_html=True)
+
+        # st.markdown("### Success Metrics")
+        # for metric in campaign_brief.success_metrics:
+        #     st.markdown(f"- {metric}")
+
+        # st.markdown("### Analyst Insights")
+        # for insight in campaign_brief.analyst_insights.split("\n"):
+        #     st.markdown(insight)
+
+        # st.markdown("### Recommendations")
+        # for rec in campaign_brief.recommendations:
+        #     st.markdown(f"- {rec}")
+
+        # st.markdown("### Next Steps")
+        # for i, step in enumerate(campaign_brief.next_steps, 1):
+        #     st.markdown(f"{i}. {step}")
 
     # Interactive feedback section
     st.markdown('<h3 class="section-subtitle">💬 Request a Change or Revision</h3>', unsafe_allow_html=True)
